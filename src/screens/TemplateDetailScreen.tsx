@@ -67,7 +67,16 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 pb-28">
+      <main className="max-w-lg mx-auto px-4 py-4">
+        {exercises.length > 0 && (
+          <button
+            onClick={() => onStart(templateId)}
+            className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98] mb-6"
+          >
+            Start Workout
+          </button>
+        )}
+
         <div className="space-y-3">
           {exercises.map((ex) => (
             <ExerciseStepperCard
@@ -89,19 +98,6 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
           )}
         </div>
       </main>
-
-      {exercises.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom bg-gray-950/95 backdrop-blur-sm border-t border-gray-800/50">
-          <div className="max-w-lg mx-auto">
-            <button
-              onClick={() => onStart(templateId)}
-              className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98]"
-            >
-              Start Workout
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
