@@ -7,7 +7,7 @@ interface BottomNavProps {
 
 export function BottomNav({ active, onChange }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800/50 safe-bottom z-20">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-sm border-t border-white/5 safe-bottom z-20">
       <div className="max-w-lg mx-auto flex">
         <NavButton
           label="Home"
@@ -48,12 +48,12 @@ function NavButton({
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex flex-col items-center py-2 gap-0.5 transition-colors ${
+      className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${
         active ? 'text-accent' : 'text-gray-500'
       }`}
     >
       {icon}
-      <span className="text-[10px] font-medium">{label}</span>
+      <span className="text-[11px] font-medium">{label}</span>
     </button>
   )
 }

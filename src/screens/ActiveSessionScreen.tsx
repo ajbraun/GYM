@@ -33,16 +33,16 @@ export function ActiveSessionScreen({
     <div className="min-h-dvh bg-gray-950">
       <SessionHeader emoji={emoji} name={name} elapsed={elapsed} onFinish={onFinish} />
 
-      <main className="max-w-lg mx-auto px-4 py-4">
+      <main className="max-w-lg mx-auto px-5 py-5">
         {/* Progress summary */}
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
             <div
-              className="h-full bg-accent rounded-full transition-all duration-300"
+              className="h-full bg-accent rounded-full transition-all duration-500 ease-out"
               style={{ width: `${totalExercises ? (completedExercises / totalExercises) * 100 : 0}%` }}
             />
           </div>
-          <span className="text-sm text-gray-400 tabular-nums flex-shrink-0">
+          <span className="text-sm text-gray-400 tabular-nums flex-shrink-0 font-medium">
             {completedExercises}/{totalExercises}
           </span>
         </div>
@@ -61,13 +61,13 @@ export function ActiveSessionScreen({
               <button
                 key={ex.id}
                 onClick={() => onSelectExercise(ex.id)}
-                className={`text-left rounded-2xl p-4 transition-all active:scale-[0.97] flex flex-col ${
+                className={`text-left rounded-2xl p-4 transition-all active:scale-[0.97] flex flex-col min-h-[130px] ${
                   isComplete
-                    ? 'bg-accent/15 border border-accent/30'
-                    : 'bg-surface-card hover:bg-surface-hover'
+                    ? 'bg-success/10 border border-success/20'
+                    : 'bg-surface-card active:bg-surface-hover'
                 }`}
               >
-                <div className={`text-sm font-semibold mb-1 leading-tight ${isComplete ? 'text-accent' : 'text-white'}`}>
+                <div className={`text-sm font-semibold mb-1 leading-tight ${isComplete ? 'text-success' : 'text-white'}`}>
                   {ex.name}
                 </div>
                 <div className="text-xs text-gray-500 mb-3">{ex.setsReps}</div>
@@ -77,7 +77,7 @@ export function ActiveSessionScreen({
                     <div className="text-xs text-gray-400 mb-2">{lastWeight} lbs</div>
                   )}
                   {suggestion && (
-                    <div className="text-xs text-accent font-medium mb-2">↑ {suggestion.suggestedWeight} lbs</div>
+                    <div className="text-xs text-accent font-medium mb-2">{suggestion.suggestedWeight} lbs</div>
                   )}
 
                   {/* Set progress dots */}
@@ -85,12 +85,14 @@ export function ActiveSessionScreen({
                     {log?.sets.map((s) => (
                       <div
                         key={s.setNumber}
-                        className={`w-2.5 h-2.5 rounded-full ${
-                          s.completed ? 'bg-accent' : 'bg-gray-700'
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                          s.completed
+                            ? isComplete ? 'bg-success' : 'bg-accent'
+                            : 'bg-white/10'
                         }`}
                       />
                     ))}
-                    <span className="text-xs text-gray-500 ml-auto">
+                    <span className="text-[11px] text-gray-500 ml-auto tabular-nums">
                       {setsCompleted}/{totalSets}
                     </span>
                   </div>

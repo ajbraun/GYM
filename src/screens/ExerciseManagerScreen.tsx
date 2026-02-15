@@ -85,31 +85,30 @@ export function ExerciseManagerScreen({ templateId, onBack }: ExerciseManagerScr
   if (!template) {
     return (
       <div className="min-h-dvh bg-gray-950 flex items-center justify-center">
-        <div className="text-accent animate-pulse">Loading...</div>
+        <div className="text-accent animate-pulse text-lg">Loading...</div>
       </div>
     )
   }
 
   return (
     <div className="min-h-dvh bg-gray-950">
-      <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800/50 safe-top">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
-          <button onClick={onBack} className="text-gray-400 hover:text-white transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur-sm border-b border-white/5 safe-top">
+        <div className="max-w-lg mx-auto px-5 py-3 flex items-center gap-3">
+          <button onClick={onBack} className="text-gray-400 hover:text-white transition-colors p-1 -ml-1">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
             <span className="text-xl">{template.emoji}</span>
-            <h1 className="text-base font-bold text-white truncate">{template.name}</h1>
+            <h1 className="text-lg font-bold text-white truncate">{template.name}</h1>
           </div>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 pb-24">
-        {/* Active exercises */}
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Active</h2>
+      <main className="max-w-lg mx-auto px-5 py-5 pb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Active</h2>
           <button
             onClick={() => setAdding(true)}
             className="text-accent text-sm font-medium hover:text-accent-light transition-colors"
@@ -141,27 +140,26 @@ export function ExerciseManagerScreen({ templateId, onBack }: ExerciseManagerScr
             />
           ))}
           {activeExercises.length === 0 && !adding && (
-            <p className="text-gray-500 text-sm py-4 text-center">No active exercises</p>
+            <p className="text-gray-500 text-sm py-6 text-center">No active exercises</p>
           )}
         </div>
 
-        {/* Inactive exercises */}
         {inactiveExercises.length > 0 && (
           <>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Inactive</h2>
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Inactive</h2>
             <div className="space-y-2">
               {inactiveExercises.map((ex) => (
                 <div
                   key={ex.id}
-                  className="bg-surface-card/50 rounded-lg p-3 flex items-center gap-3 opacity-60"
+                  className="bg-surface-card/50 rounded-2xl p-4 flex items-center gap-3 opacity-50"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm text-gray-400">{ex.name}</div>
-                    <div className="text-xs text-gray-600">{ex.setsReps}</div>
+                    <div className="text-sm text-gray-400 font-medium">{ex.name}</div>
+                    <div className="text-xs text-gray-600 mt-0.5">{ex.setsReps}</div>
                   </div>
                   <button
                     onClick={() => handleToggleActive(ex)}
-                    className="text-xs text-accent font-medium hover:text-accent-light transition-colors px-2 py-1"
+                    className="text-xs text-accent font-medium hover:text-accent-light transition-colors px-3 py-1.5"
                   >
                     Restore
                   </button>
@@ -202,35 +200,35 @@ function ExerciseEditorRow({
   const [setsValue, setSetsValue] = useState(exercise.setsReps)
 
   return (
-    <div className="bg-surface-card rounded-lg p-3">
-      <div className="flex items-start gap-2">
-        {/* Reorder buttons */}
+    <div className="bg-surface-card rounded-2xl p-4">
+      <div className="flex items-start gap-3">
+        {/* Reorder */}
         <div className="flex flex-col gap-0.5 pt-0.5 flex-shrink-0">
           <button
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            className={`w-5 h-5 flex items-center justify-center rounded ${
-              canMoveUp ? 'text-gray-400 hover:text-white' : 'text-gray-700'
+            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
+              canMoveUp ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-700'
             }`}
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
             </svg>
           </button>
           <button
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            className={`w-5 h-5 flex items-center justify-center rounded ${
-              canMoveDown ? 'text-gray-400 hover:text-white' : 'text-gray-700'
+            className={`w-7 h-7 flex items-center justify-center rounded-lg transition-colors ${
+              canMoveDown ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-700'
             }`}
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
         </div>
 
-        {/* Name + sets/reps */}
+        {/* Content */}
         <div className="flex-1 min-w-0">
           {editingName ? (
             <input
@@ -253,7 +251,7 @@ function ExerciseEditorRow({
             </div>
           )}
 
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2.5 mt-1.5">
             {editingSets ? (
               <input
                 autoFocus
@@ -277,10 +275,10 @@ function ExerciseEditorRow({
 
             <button
               onClick={onToggleWeighted}
-              className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+              className={`text-xs px-2 py-0.5 rounded-md transition-colors ${
                 exercise.isWeighted
-                  ? 'bg-accent/20 text-accent'
-                  : 'bg-gray-800 text-gray-500'
+                  ? 'bg-accent/15 text-accent'
+                  : 'bg-white/5 text-gray-500'
               }`}
             >
               {exercise.isWeighted ? 'Weighted' : 'No weight'}
@@ -288,10 +286,10 @@ function ExerciseEditorRow({
           </div>
         </div>
 
-        {/* Remove button */}
+        {/* Remove */}
         <button
           onClick={onToggleActive}
-          className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 p-1"
+          className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 p-1.5"
           title="Remove from workout"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -320,16 +318,16 @@ function AddExerciseForm({
   }
 
   return (
-    <div className="bg-surface-card rounded-lg p-3 mb-3 border border-accent/30">
+    <div className="bg-surface-card rounded-2xl p-4 mb-3 border border-accent/20">
       <input
         autoFocus
         placeholder="Exercise name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-        className="text-sm text-white bg-transparent border-b border-gray-600 outline-none w-full mb-2 focus:border-accent placeholder:text-gray-600"
+        className="text-sm text-white bg-transparent border-b border-gray-600 outline-none w-full mb-3 focus:border-accent placeholder:text-gray-600"
       />
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-3 mb-4">
         <input
           placeholder="3 × 10"
           value={setsReps}
@@ -338,24 +336,24 @@ function AddExerciseForm({
         />
         <button
           onClick={() => setIsWeighted(!isWeighted)}
-          className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
-            isWeighted ? 'bg-accent/20 text-accent' : 'bg-gray-800 text-gray-500'
+          className={`text-xs px-2 py-0.5 rounded-md transition-colors ${
+            isWeighted ? 'bg-accent/15 text-accent' : 'bg-white/5 text-gray-500'
           }`}
         >
           {isWeighted ? 'Weighted' : 'No weight'}
         </button>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <button
           onClick={handleSubmit}
           disabled={!name.trim()}
-          className="text-xs bg-accent hover:bg-accent-dark disabled:opacity-40 text-white font-medium px-3 py-1.5 rounded-md transition-colors"
+          className="text-sm bg-accent hover:bg-accent-dark disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-xl transition-colors"
         >
           Add
         </button>
         <button
           onClick={onCancel}
-          className="text-xs text-gray-400 hover:text-white px-3 py-1.5 transition-colors"
+          className="text-sm text-gray-400 hover:text-white px-4 py-2 transition-colors"
         >
           Cancel
         </button>

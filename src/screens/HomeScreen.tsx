@@ -21,7 +21,7 @@ export function HomeScreen({ templates, onSelect, onAdd, onDelete }: HomeScreenP
   }
 
   return (
-    <div className="px-4 py-4 space-y-4">
+    <div className="px-5 py-5 space-y-4">
       {templates.map((t) => (
         <TemplateCard
           key={t.id}
@@ -44,17 +44,17 @@ export function HomeScreen({ templates, onSelect, onAdd, onDelete }: HomeScreenP
             }}
             className="text-lg text-white font-bold bg-transparent border-b border-accent outline-none w-full mb-4 placeholder:text-gray-600"
           />
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={handleAdd}
               disabled={!newName.trim()}
-              className="bg-accent hover:bg-accent-dark disabled:opacity-40 text-white font-semibold px-5 py-2 rounded-xl text-sm transition-colors"
+              className="bg-accent hover:bg-accent-dark disabled:opacity-40 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors"
             >
               Add
             </button>
             <button
               onClick={() => { setNewName(''); setAdding(false) }}
-              className="text-gray-400 hover:text-white px-4 py-2 text-sm transition-colors"
+              className="text-gray-400 hover:text-white px-4 py-2.5 text-sm transition-colors"
             >
               Cancel
             </button>

@@ -14,34 +14,38 @@ export function TemplateCard({ template, onSelect, onDelete }: TemplateCardProps
         ? 'Done today'
         : template.daysSinceLastDone === 1
           ? 'Done yesterday'
-          : `${template.daysSinceLastDone} days ago`
+          : `${template.daysSinceLastDone}d ago`
 
   return (
-    <div className="bg-surface-card rounded-2xl p-5 active:scale-[0.98] transition-all">
-      <div className="flex items-start gap-4">
-        <button
-          onClick={() => onSelect(template.id)}
-          className="flex items-start gap-4 flex-1 min-w-0 text-left"
-        >
-          <div className="text-4xl">{template.emoji}</div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg text-white font-bold truncate">{template.name}</h3>
-            <div className="text-sm text-gray-400 mt-0.5">{staleness}</div>
-            <div className="text-xs text-gray-500 mt-1">
-              {template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''}
-            </div>
+    <button
+      onClick={() => onSelect(template.id)}
+      className="w-full bg-surface-card rounded-2xl p-5 text-left transition-all active:scale-[0.98] active:bg-surface-hover"
+    >
+      <div className="flex items-center gap-4">
+        <div className="text-4xl">{template.emoji}</div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg text-white font-bold truncate">{template.name}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-sm text-gray-400">{staleness}</span>
+            <span className="text-gray-600">·</span>
+            <span className="text-sm text-gray-500">{template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''}</span>
           </div>
-        </button>
-        <button
-          onClick={() => onDelete(template.id)}
-          className="text-gray-700 hover:text-red-400 transition-colors p-1 -mt-1 -mr-1"
-          title="Delete workout"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div
+            role="button"
+            onClick={(e) => { e.stopPropagation(); onDelete(template.id) }}
+            className="text-gray-700 hover:text-red-400 transition-colors p-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-        </button>
+        </div>
       </div>
-    </div>
+    </button>
   )
 }
