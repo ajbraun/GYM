@@ -47,7 +47,7 @@ export function ActiveSessionScreen({
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           {exercises.map((ex) => {
             const log = logs.get(ex.id)
             const isComplete = log?.completed ?? false
@@ -61,47 +61,37 @@ export function ActiveSessionScreen({
               <button
                 key={ex.id}
                 onClick={() => onSelectExercise(ex.id)}
-                className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
+                className={`text-left rounded-2xl p-4 transition-all active:scale-[0.97] flex flex-col ${
                   isComplete
-                    ? 'bg-accent/10 border border-accent/20'
+                    ? 'bg-accent/15 border border-accent/30'
                     : 'bg-surface-card hover:bg-surface-hover'
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-base font-semibold mb-1 ${isComplete ? 'text-accent' : 'text-white'}`}>
-                      {ex.name}
-                    </div>
-                    <div className="text-sm text-gray-500 mb-3">{ex.setsReps}</div>
+                <div className={`text-sm font-semibold mb-1 leading-tight ${isComplete ? 'text-accent' : 'text-white'}`}>
+                  {ex.name}
+                </div>
+                <div className="text-xs text-gray-500 mb-3">{ex.setsReps}</div>
 
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {ex.isWeighted && lastWeight != null && (
-                        <span className="text-xs text-gray-400 bg-gray-800/80 px-2 py-1 rounded-md">
-                          Last: {lastWeight} lbs
-                        </span>
-                      )}
-                      {suggestion && (
-                        <span className="text-xs text-accent font-medium bg-accent/10 px-2 py-1 rounded-md">
-                          ↑ Try {suggestion.suggestedWeight} lbs
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                <div className="mt-auto">
+                  {ex.isWeighted && lastWeight != null && !suggestion && (
+                    <div className="text-xs text-gray-400 mb-2">{lastWeight} lbs</div>
+                  )}
+                  {suggestion && (
+                    <div className="text-xs text-accent font-medium mb-2">↑ {suggestion.suggestedWeight} lbs</div>
+                  )}
 
-                  <div className="flex flex-col items-end gap-2 flex-shrink-0 pt-1">
-                    {/* Set progress dots */}
-                    <div className="flex items-center gap-1.5">
-                      {log?.sets.map((s) => (
-                        <div
-                          key={s.setNumber}
-                          className={`w-3 h-3 rounded-full ${
-                            s.completed ? 'bg-accent' : 'bg-gray-700'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {setsCompleted}/{totalSets} sets
+                  {/* Set progress dots */}
+                  <div className="flex items-center gap-1.5">
+                    {log?.sets.map((s) => (
+                      <div
+                        key={s.setNumber}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          s.completed ? 'bg-accent' : 'bg-gray-700'
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs text-gray-500 ml-auto">
+                      {setsCompleted}/{totalSets}
                     </span>
                   </div>
                 </div>

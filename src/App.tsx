@@ -7,6 +7,7 @@ import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { SessionDetailScreen } from './screens/SessionDetailScreen'
 import { ExerciseManagerScreen } from './screens/ExerciseManagerScreen'
+import { TemplateDetailScreen } from './screens/TemplateDetailScreen'
 import { useTemplates } from './hooks/useTemplates'
 import { useActiveSession } from './hooks/useActiveSession'
 import { usePreviousWeights } from './hooks/usePreviousWeights'
@@ -17,6 +18,7 @@ import { exportToCsv } from './services/exportCsv'
 
 type Screen =
   | { type: 'tabs' }
+  | { type: 'templateDetail'; templateId: string }
   | { type: 'session' }
   | { type: 'exerciseDetail'; exerciseId: string }
   | { type: 'sessionDetail'; sessionId: string }
@@ -38,6 +40,10 @@ function App() {
       setScreen({ type: 'session' })
     }
   }, [activeSession.loading, activeSession.isActive, screen.type])
+
+  const handleSelectTemplate = useCallback((templateId: string) => {
+    setScreen({ type: 'templateDetail', templateId })
+  }, [])
 
   const handleStart = useCallback(async (templateId: string) => {
     await activeSession.start(templateId)
@@ -67,12 +73,17 @@ function App() {
     setScreen({ type: 'tabs' })
   }, [])
 
+  const handleBackFromTemplateDetail = useCallback(() => {
+    setScreen({ type: 'tabs' })
+    reloadTemplates()
+  }, [reloadTemplates])
+
   const handleEditExercises = useCallback((templateId: string) => {
     setScreen({ type: 'exerciseManager', templateId })
   }, [])
 
-  const handleBackFromExerciseManager = useCallback(() => {
-    setScreen({ type: 'tabs' })
+  const handleBackFromExerciseManager = useCallback((templateId: string) => {
+    setScreen({ type: 'templateDetail', templateId })
     reloadTemplates()
   }, [reloadTemplates])
 
@@ -129,6 +140,18 @@ function App() {
     )
   }
 
+  // Template detail - full screen, no bottom nav
+  if (screen.type === 'templateDetail') {
+    return (
+      <TemplateDetailScreen
+        templateId={screen.templateId}
+        onBack={handleBackFromTemplateDetail}
+        onStart={handleStart}
+        onEditExercises={handleEditExercises}
+      />
+    )
+  }
+
   // Session detail - full screen, no bottom nav
   if (screen.type === 'sessionDetail') {
     return <SessionDetailScreen sessionId={screen.sessionId} onBack={handleBackFromDetail} />
@@ -136,7 +159,7 @@ function App() {
 
   // Exercise manager - full screen, no bottom nav
   if (screen.type === 'exerciseManager') {
-    return <ExerciseManagerScreen templateId={screen.templateId} onBack={handleBackFromExerciseManager} />
+    return <ExerciseManagerScreen templateId={screen.templateId} onBack={() => handleBackFromExerciseManager(screen.templateId)} />
   }
 
   // Tab screens
@@ -145,7 +168,7 @@ function App() {
       <Header />
       <main className="max-w-lg mx-auto">
         {tab === 'home' && (
-          <HomeScreen templates={templates} onStart={handleStart} onEdit={handleEditExercises} onRename={rename} onAdd={addTemplate} onDelete={removeTemplate} />
+          <HomeScreen templates={templates} onSelect={handleSelectTemplate} onRename={rename} onAdd={addTemplate} onDelete={removeTemplate} />
         )}
         {tab === 'history' && (
           <HistoryScreen sessions={sessions} onViewSession={handleViewSession} onClearAll={handleClearAll} onExportCsv={exportToCsv} />
