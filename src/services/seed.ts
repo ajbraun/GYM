@@ -7,8 +7,7 @@ const now = new Date().toISOString()
 const defaultTemplates: WorkoutTemplate[] = [
   { id: 'tpl-leg', name: 'Leg Day', emoji: '🦵', sortOrder: 0, createdAt: now, updatedAt: now },
   { id: 'tpl-upper', name: 'Upper Body', emoji: '💪', sortOrder: 1, createdAt: now, updatedAt: now },
-  { id: 'tpl-full', name: 'Full Body', emoji: '⚡', sortOrder: 2, createdAt: now, updatedAt: now },
-  { id: 'tpl-recovery', name: 'Active Recovery', emoji: '❤️', sortOrder: 3, createdAt: now, updatedAt: now },
+  { id: 'tpl-recovery', name: 'Active Recovery', emoji: '❤️', sortOrder: 2, createdAt: now, updatedAt: now },
 ]
 
 const defaultExercises: Exercise[] = [
@@ -23,12 +22,6 @@ const defaultExercises: Exercise[] = [
   { id: 'ex-6', templateId: 'tpl-upper', name: 'Bent Over Rows', setsReps: '3 × 10-12', isWeighted: true, active: true, sortOrder: 1, createdAt: now },
   { id: 'ex-7', templateId: 'tpl-upper', name: 'Push-Ups', setsReps: '3 × failure', isWeighted: true, active: true, sortOrder: 2, createdAt: now },
   { id: 'ex-8', templateId: 'tpl-upper', name: 'Lat Pulldowns', setsReps: '3 × 10-12', isWeighted: true, active: true, sortOrder: 3, createdAt: now },
-
-  // Full Body
-  { id: 'ex-9', templateId: 'tpl-full', name: 'Deadlifts', setsReps: '3 × 5-8', isWeighted: true, active: true, sortOrder: 0, createdAt: now },
-  { id: 'ex-10', templateId: 'tpl-full', name: 'Bench Press', setsReps: '3 × 8-10', isWeighted: true, active: true, sortOrder: 1, createdAt: now },
-  { id: 'ex-11', templateId: 'tpl-full', name: 'Bulgarian Split Squats', setsReps: '3 × 8-10/leg', isWeighted: true, active: true, sortOrder: 2, createdAt: now },
-  { id: 'ex-12', templateId: 'tpl-full', name: 'Plank Rows', setsReps: '3 × 10/arm', isWeighted: true, active: true, sortOrder: 3, createdAt: now },
 
   // Active Recovery
   { id: 'ex-13', templateId: 'tpl-recovery', name: 'Light Cardio', setsReps: '1 × 20-30 min', isWeighted: false, active: true, sortOrder: 0, createdAt: now },

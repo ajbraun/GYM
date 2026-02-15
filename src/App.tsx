@@ -26,7 +26,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>({ type: 'tabs' })
   const [tab, setTab] = useState<Tab>('home')
 
-  const { templates, loading: templatesLoading, reload: reloadTemplates, rename } = useTemplates()
+  const { templates, loading: templatesLoading, reload: reloadTemplates, rename, add: addTemplate, remove: removeTemplate } = useTemplates()
   const activeSession = useActiveSession()
   const previousWeights = usePreviousWeights(activeSession.session?.templateId ?? null)
   const goUpSuggestions = getGoUpSuggestions(previousWeights)
@@ -145,7 +145,7 @@ function App() {
       <Header />
       <main className="max-w-lg mx-auto">
         {tab === 'home' && (
-          <HomeScreen templates={templates} onStart={handleStart} onEdit={handleEditExercises} onRename={rename} />
+          <HomeScreen templates={templates} onStart={handleStart} onEdit={handleEditExercises} onRename={rename} onAdd={addTemplate} onDelete={removeTemplate} />
         )}
         {tab === 'history' && (
           <HistoryScreen sessions={sessions} onViewSession={handleViewSession} onClearAll={handleClearAll} onExportCsv={exportToCsv} />

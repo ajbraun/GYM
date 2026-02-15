@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { WorkoutTemplate } from '../types/template'
-import { getAllTemplates, updateTemplateName } from '../services/templateService'
+import { getAllTemplates, updateTemplateName, addTemplate, deleteTemplate } from '../services/templateService'
 import { getLastCompletedSession } from '../services/sessionService'
 import { getExercisesForTemplate } from '../services/exerciseService'
 import { seedIfEmpty } from '../services/seed'
@@ -32,7 +32,6 @@ export function useTemplates() {
       })
     )
 
-    // Sort by staleness: never-done first, then longest since last done
     withMeta.sort((a, b) => {
       if (a.daysSinceLastDone === null && b.daysSinceLastDone === null) return a.sortOrder - b.sortOrder
       if (a.daysSinceLastDone === null) return -1
@@ -51,5 +50,15 @@ export function useTemplates() {
     await load()
   }, [load])
 
-  return { templates, loading, reload: load, rename }
+  const add = useCallback(async (name: string) => {
+    await addTemplate(name)
+    await load()
+  }, [load])
+
+  const remove = useCallback(async (id: string) => {
+    await deleteTemplate(id)
+    await load()
+  }, [load])
+
+  return { templates, loading, reload: load, rename, add, remove }
 }

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { SessionWithMeta } from '../hooks/useSessionHistory'
 import { SessionCard } from '../components/history/SessionCard'
 
@@ -10,8 +9,6 @@ interface HistoryScreenProps {
 }
 
 export function HistoryScreen({ sessions, onViewSession, onClearAll, onExportCsv }: HistoryScreenProps) {
-  const [confirming, setConfirming] = useState(false)
-
   return (
     <div className="px-4 py-4">
       {sessions.length === 0 ? (
@@ -26,7 +23,6 @@ export function HistoryScreen({ sessions, onViewSession, onClearAll, onExportCsv
         </div>
       )}
 
-      {/* Actions */}
       <div className="border-t border-gray-800/50 pt-4 space-y-3">
         {sessions.length > 0 && (
           <button
@@ -40,34 +36,12 @@ export function HistoryScreen({ sessions, onViewSession, onClearAll, onExportCsv
           </button>
         )}
 
-        {confirming ? (
-          <div className="bg-red-950/50 border border-red-800/50 rounded-lg p-4">
-            <p className="text-sm text-red-300 mb-3">
-              This will delete all workouts, history, and exercises. Templates will be re-seeded. Are you sure?
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => { onClearAll(); setConfirming(false) }}
-                className="flex-1 py-2 text-sm font-medium text-red-400 border border-red-800 rounded-lg hover:bg-red-900/50 transition-colors"
-              >
-                Yes, clear everything
-              </button>
-              <button
-                onClick={() => setConfirming(false)}
-                className="flex-1 py-2 text-sm text-gray-400 border border-gray-800 rounded-lg hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setConfirming(true)}
-            className="w-full py-3 text-sm text-red-400/60 hover:text-red-400 transition-colors"
-          >
-            Clear all data
-          </button>
-        )}
+        <button
+          onClick={onClearAll}
+          className="w-full py-3 text-sm text-red-400/60 hover:text-red-400 transition-colors"
+        >
+          Clear all data
+        </button>
       </div>
     </div>
   )
