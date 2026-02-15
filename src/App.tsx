@@ -12,6 +12,8 @@ import { useActiveSession } from './hooks/useActiveSession'
 import { usePreviousWeights } from './hooks/usePreviousWeights'
 import { getGoUpSuggestions } from './hooks/useGoUpSuggestions'
 import { useSessionHistory } from './hooks/useSessionHistory'
+import { clearAllData } from './services/db'
+import { exportToCsv } from './services/exportCsv'
 
 type Screen =
   | { type: 'tabs' }
@@ -73,6 +75,12 @@ function App() {
     setScreen({ type: 'tabs' })
     reloadTemplates()
   }, [reloadTemplates])
+
+  const handleClearAll = useCallback(async () => {
+    await clearAllData()
+    reloadTemplates()
+    reloadHistory()
+  }, [reloadTemplates, reloadHistory])
 
   // Loading state
   if (templatesLoading || activeSession.loading) {
@@ -140,7 +148,7 @@ function App() {
           <HomeScreen templates={templates} onStart={handleStart} onEdit={handleEditExercises} onRename={rename} />
         )}
         {tab === 'history' && (
-          <HistoryScreen sessions={sessions} onViewSession={handleViewSession} />
+          <HistoryScreen sessions={sessions} onViewSession={handleViewSession} onClearAll={handleClearAll} onExportCsv={exportToCsv} />
         )}
       </main>
       <BottomNav active={tab} onChange={setTab} />

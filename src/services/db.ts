@@ -65,4 +65,17 @@ export async function getDB(): Promise<IDBPDatabase<WorkoutTrackerDB>> {
   return dbInstance
 }
 
+export async function clearAllData(): Promise<void> {
+  const db = await getDB()
+  const tx = db.transaction(['templates', 'exercises', 'sessions', 'exerciseLogs', 'meta'], 'readwrite')
+  await Promise.all([
+    tx.objectStore('templates').clear(),
+    tx.objectStore('exercises').clear(),
+    tx.objectStore('sessions').clear(),
+    tx.objectStore('exerciseLogs').clear(),
+    tx.objectStore('meta').clear(),
+    tx.done,
+  ])
+}
+
 export type { WorkoutTrackerDB }
