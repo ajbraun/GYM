@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Exercise } from '../types/exercise'
 import type { WorkoutTemplate } from '../types/template'
-import { getExercisesForTemplate, updateExercise } from '../services/exerciseService'
-import { getTemplate, updateTemplateName } from '../services/templateService'
-import { parseSetsReps } from '../services/exerciseLogService'
+import { getExercisesForTemplate } from '../services/exerciseService'
+import { getTemplate } from '../services/templateService'
 
 interface TemplateDetailScreenProps {
   templateId: string
@@ -25,17 +24,7 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
     setExercises(exs)
   }, [templateId])
 
-  const handleRename = async (name: string) => {
-    await updateTemplateName(templateId, name)
-    await load()
-  }
-
   useEffect(() => { load() }, [load])
-
-  const handleUpdateSetsReps = async (exercise: Exercise, newSetsReps: string) => {
-    await updateExercise({ ...exercise, setsReps: newSetsReps })
-    await load()
-  }
 
   if (!template) {
     return (
@@ -56,185 +45,54 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-2xl">{template.emoji}</span>
-            <EditableTitle name={template.name} onRename={handleRename} />
+            <h1 className="text-lg font-bold text-white truncate">{template.name}</h1>
           </div>
-          <button
-            onClick={() => onEditExercises(templateId)}
-            className="text-sm text-gray-400 hover:text-accent transition-colors"
-          >
-            Edit
-          </button>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4">
-        {exercises.length > 0 && (
-          <button
-            onClick={() => onStart(templateId)}
-            className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98] mb-6"
-          >
-            Start Workout
-          </button>
-        )}
-
-        <div className="space-y-3">
-          {exercises.map((ex) => (
-            <ExerciseStepperCard
-              key={ex.id}
-              exercise={ex}
-              onUpdateSetsReps={(sr) => handleUpdateSetsReps(ex, sr)}
-            />
-          ))}
-          {exercises.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-3">No exercises yet</p>
-              <button
-                onClick={() => onEditExercises(templateId)}
-                className="text-accent text-sm font-medium"
-              >
-                Add exercises
-              </button>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  )
-}
-
-function adjustSets(setsReps: string, delta: number): string {
-  const { setCount, targetReps } = parseSetsReps(setsReps)
-  const newSets = Math.max(1, setCount + delta)
-  return `${newSets} × ${targetReps}`
-}
-
-function adjustReps(setsReps: string, delta: number): string {
-  const { setCount, targetReps } = parseSetsReps(setsReps)
-
-  // Range like "8-10"
-  const rangeMatch = targetReps.match(/^(\d+)\s*-\s*(\d+)(.*)$/)
-  if (rangeMatch) {
-    const low = Math.max(1, parseInt(rangeMatch[1]) + delta)
-    const high = Math.max(1, parseInt(rangeMatch[2]) + delta)
-    return `${setCount} × ${low}-${high}${rangeMatch[3]}`
-  }
-
-  // Single number like "10" or "10/leg"
-  const singleMatch = targetReps.match(/^(\d+)(.*)$/)
-  if (singleMatch) {
-    const num = Math.max(1, parseInt(singleMatch[1]) + delta)
-    return `${setCount} × ${num}${singleMatch[2]}`
-  }
-
-  // Non-numeric (e.g. "failure", "20-30 min") — don't adjust
-  return setsReps
-}
-
-function canAdjustReps(setsReps: string): boolean {
-  const { targetReps } = parseSetsReps(setsReps)
-  return /^\d+/.test(targetReps)
-}
-
-function EditableTitle({ name, onRename }: { name: string; onRename: (name: string) => void }) {
-  const [editing, setEditing] = useState(false)
-  const [value, setValue] = useState(name)
-
-  const save = () => {
-    const trimmed = value.trim()
-    if (trimmed && trimmed !== name) {
-      onRename(trimmed)
-    } else {
-      setValue(name)
-    }
-    setEditing(false)
-  }
-
-  if (editing) {
-    return (
-      <input
-        autoFocus
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={save}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') save()
-          if (e.key === 'Escape') { setValue(name); setEditing(false) }
-        }}
-        className="text-lg font-bold text-white bg-transparent border-b border-accent outline-none w-full"
-      />
-    )
-  }
-
-  return (
-    <h1
-      onClick={() => setEditing(true)}
-      className="text-lg font-bold text-white truncate cursor-pointer hover:text-accent-light transition-colors"
-    >
-      {name}
-    </h1>
-  )
-}
-
-function ExerciseStepperCard({
-  exercise,
-  onUpdateSetsReps,
-}: {
-  exercise: Exercise
-  onUpdateSetsReps: (setsReps: string) => void
-}) {
-  const { setCount, targetReps } = parseSetsReps(exercise.setsReps)
-  const repsAdjustable = canAdjustReps(exercise.setsReps)
-
-  return (
-    <div className="bg-surface-card rounded-2xl p-5">
-      <div className="text-base font-semibold text-white mb-4">{exercise.name}</div>
-
-      <div className="flex items-center gap-6">
-        {/* Sets stepper */}
-        <div className="flex-1">
-          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sets</div>
-          <div className="flex items-center gap-3">
+      <main className="max-w-lg mx-auto px-4 py-6">
+        {exercises.length > 0 ? (
+          <>
             <button
-              onClick={() => onUpdateSetsReps(adjustSets(exercise.setsReps, -1))}
-              disabled={setCount <= 1}
-              className="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 disabled:opacity-30 text-white text-lg font-bold flex items-center justify-center transition-colors active:scale-95"
+              onClick={() => onStart(templateId)}
+              className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98] mb-6"
             >
-              −
+              Start Workout
             </button>
-            <span className="text-2xl font-bold text-white tabular-nums w-8 text-center">{setCount}</span>
+
+            <div className="space-y-3 mb-6">
+              {exercises.map((ex) => (
+                <div key={ex.id} className="bg-surface-card rounded-2xl p-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-base font-semibold text-white">{ex.name}</div>
+                    <div className="text-sm text-gray-500 mt-0.5">{ex.setsReps}</div>
+                  </div>
+                  {ex.isWeighted && (
+                    <span className="text-xs text-gray-500 bg-gray-800/80 px-2 py-1 rounded-md">Weighted</span>
+                  )}
+                </div>
+              ))}
+            </div>
+
             <button
-              onClick={() => onUpdateSetsReps(adjustSets(exercise.setsReps, 1))}
-              className="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-lg font-bold flex items-center justify-center transition-colors active:scale-95"
+              onClick={() => onEditExercises(templateId)}
+              className="w-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 font-medium py-3 rounded-2xl text-sm transition-colors"
             >
-              +
+              Edit Workout
+            </button>
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 mb-4">No exercises yet</p>
+            <button
+              onClick={() => onEditExercises(templateId)}
+              className="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+            >
+              Add Exercises
             </button>
           </div>
-        </div>
-
-        {/* Reps stepper or display */}
-        <div className="flex-1">
-          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Reps</div>
-          {repsAdjustable ? (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onUpdateSetsReps(adjustReps(exercise.setsReps, -1))}
-                className="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 disabled:opacity-30 text-white text-lg font-bold flex items-center justify-center transition-colors active:scale-95"
-              >
-                −
-              </button>
-              <span className="text-2xl font-bold text-white tabular-nums text-center min-w-8">{targetReps}</span>
-              <button
-                onClick={() => onUpdateSetsReps(adjustReps(exercise.setsReps, 1))}
-                className="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 text-white text-lg font-bold flex items-center justify-center transition-colors active:scale-95"
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <div className="text-2xl font-bold text-white h-10 flex items-center">{targetReps}</div>
-          )}
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   )
 }
