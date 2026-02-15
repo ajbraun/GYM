@@ -4,10 +4,11 @@ import type { TemplateWithMeta } from '../../hooks/useTemplates'
 interface TemplateCardProps {
   template: TemplateWithMeta
   onStart: (templateId: string) => void
+  onEdit: (templateId: string) => void
   onRename: (id: string, name: string) => void
 }
 
-export function TemplateCard({ template, onStart, onRename }: TemplateCardProps) {
+export function TemplateCard({ template, onStart, onEdit, onRename }: TemplateCardProps) {
   const staleness =
     template.daysSinceLastDone === null
       ? 'Never done'
@@ -25,9 +26,12 @@ export function TemplateCard({ template, onStart, onRename }: TemplateCardProps)
         <TemplateName name={template.name} id={template.id} onRename={onRename} />
         <div className="flex items-center gap-3 mt-1">
           <span className="text-xs text-gray-400">{staleness}</span>
-          <span className="text-xs text-gray-600">
-            {template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''}
-          </span>
+          <button
+            onClick={() => onEdit(template.id)}
+            className="text-xs text-gray-500 hover:text-accent transition-colors"
+          >
+            {template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''} &middot; Edit
+          </button>
         </div>
       </div>
 

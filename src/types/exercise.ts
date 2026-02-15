@@ -5,5 +5,6 @@ export interface Exercise {
   setsReps: string
   isWeighted: boolean
   sortOrder: number
+  active: boolean
   createdAt: string
 }

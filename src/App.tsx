@@ -5,13 +5,18 @@ import { HomeScreen } from './screens/HomeScreen'
 import { ActiveSessionScreen } from './screens/ActiveSessionScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { SessionDetailScreen } from './screens/SessionDetailScreen'
+import { ExerciseManagerScreen } from './screens/ExerciseManagerScreen'
 import { useTemplates } from './hooks/useTemplates'
 import { useActiveSession } from './hooks/useActiveSession'
 import { usePreviousWeights } from './hooks/usePreviousWeights'
 import { getGoUpSuggestions } from './hooks/useGoUpSuggestions'
 import { useSessionHistory } from './hooks/useSessionHistory'
 
-type Screen = { type: 'tabs' } | { type: 'session' } | { type: 'sessionDetail'; sessionId: string }
+type Screen =
+  | { type: 'tabs' }
+  | { type: 'session' }
+  | { type: 'sessionDetail'; sessionId: string }
+  | { type: 'exerciseManager'; templateId: string }
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ type: 'tabs' })
@@ -50,6 +55,15 @@ function App() {
     setScreen({ type: 'tabs' })
   }, [])
 
+  const handleEditExercises = useCallback((templateId: string) => {
+    setScreen({ type: 'exerciseManager', templateId })
+  }, [])
+
+  const handleBackFromExerciseManager = useCallback(() => {
+    setScreen({ type: 'tabs' })
+    reloadTemplates()
+  }, [reloadTemplates])
+
   // Loading state
   if (templatesLoading || activeSession.loading) {
     return (
@@ -84,13 +98,18 @@ function App() {
     return <SessionDetailScreen sessionId={screen.sessionId} onBack={handleBackFromDetail} />
   }
 
+  // Exercise manager - full screen, no bottom nav
+  if (screen.type === 'exerciseManager') {
+    return <ExerciseManagerScreen templateId={screen.templateId} onBack={handleBackFromExerciseManager} />
+  }
+
   // Tab screens
   return (
     <div className="min-h-dvh bg-gray-950 pb-16">
       <Header />
       <main className="max-w-lg mx-auto">
         {tab === 'home' && (
-          <HomeScreen templates={templates} onStart={handleStart} onRename={rename} />
+          <HomeScreen templates={templates} onStart={handleStart} onEdit={handleEditExercises} onRename={rename} />
         )}
         {tab === 'history' && (
           <HistoryScreen sessions={sessions} onViewSession={handleViewSession} />

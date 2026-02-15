@@ -13,7 +13,7 @@ function formatTime(seconds: number): string {
 
 export function SessionHeader({ emoji, name, elapsed, onFinish }: SessionHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800/50">
+    <header className="sticky top-0 z-10 bg-gray-950/95 backdrop-blur-sm border-b border-gray-800/50 pt-safe">
       <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-xl">{emoji}</span>
