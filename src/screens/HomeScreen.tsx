@@ -4,12 +4,13 @@ import type { TemplateWithMeta } from '../hooks/useTemplates'
 
 interface HomeScreenProps {
   templates: TemplateWithMeta[]
+  activeTemplateId: string | null
   onSelect: (templateId: string) => void
   onAdd: (name: string) => void
   onDelete: (id: string) => void
 }
 
-export function HomeScreen({ templates, onSelect, onAdd, onDelete }: HomeScreenProps) {
+export function HomeScreen({ templates, activeTemplateId, onSelect, onAdd, onDelete }: HomeScreenProps) {
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
 
@@ -26,6 +27,7 @@ export function HomeScreen({ templates, onSelect, onAdd, onDelete }: HomeScreenP
         <TemplateCard
           key={t.id}
           template={t}
+          isActive={t.id === activeTemplateId}
           onSelect={onSelect}
           onDelete={onDelete}
         />

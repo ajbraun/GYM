@@ -11,6 +11,7 @@ interface ActiveSessionScreenProps {
   logs: Map<string, ExerciseLog>
   previousWeights: Map<string, ExerciseLog>
   goUpSuggestions: Map<string, GoUpSuggestion>
+  onBack: () => void
   onFinish: () => void
   onSelectExercise: (exerciseId: string) => void
 }
@@ -23,6 +24,7 @@ export function ActiveSessionScreen({
   logs,
   previousWeights,
   goUpSuggestions,
+  onBack,
   onFinish,
   onSelectExercise,
 }: ActiveSessionScreenProps) {
@@ -31,7 +33,7 @@ export function ActiveSessionScreen({
 
   return (
     <div className="min-h-dvh bg-gray-950">
-      <SessionHeader emoji={emoji} name={name} elapsed={elapsed} onFinish={onFinish} />
+      <SessionHeader emoji={emoji} name={name} elapsed={elapsed} onBack={onBack} onFinish={onFinish} />
 
       <main className="max-w-lg mx-auto px-5 py-5">
         {/* Progress summary */}

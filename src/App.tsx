@@ -34,21 +34,31 @@ function App() {
   const goUpSuggestions = getGoUpSuggestions(previousWeights)
   const { sessions, reload: reloadHistory } = useSessionHistory()
 
-  // Resume active session on load
+  // Resume active session on load (only on first load)
   useEffect(() => {
     if (!activeSession.loading && activeSession.isActive && screen.type === 'tabs') {
       setScreen({ type: 'session' })
     }
-  }, [activeSession.loading, activeSession.isActive, screen.type])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSession.loading])
 
   const handleSelectTemplate = useCallback((templateId: string) => {
-    setScreen({ type: 'templateDetail', templateId })
-  }, [])
+    // If there's an active session for this template, jump back into it
+    if (activeSession.isActive && activeSession.session?.templateId === templateId) {
+      setScreen({ type: 'session' })
+    } else {
+      setScreen({ type: 'templateDetail', templateId })
+    }
+  }, [activeSession.isActive, activeSession.session?.templateId])
 
   const handleStart = useCallback(async (templateId: string) => {
     await activeSession.start(templateId)
     setScreen({ type: 'session' })
   }, [activeSession.start])
+
+  const handleBackFromSession = useCallback(() => {
+    setScreen({ type: 'tabs' })
+  }, [])
 
   const handleFinish = useCallback(async () => {
     await activeSession.finish()
@@ -134,6 +144,7 @@ function App() {
         logs={activeSession.logs}
         previousWeights={previousWeights}
         goUpSuggestions={goUpSuggestions}
+        onBack={handleBackFromSession}
         onFinish={handleFinish}
         onSelectExercise={handleSelectExercise}
       />
@@ -168,7 +179,7 @@ function App() {
       <Header />
       <main className="max-w-lg mx-auto">
         {tab === 'home' && (
-          <HomeScreen templates={templates} onSelect={handleSelectTemplate} onAdd={addTemplate} onDelete={removeTemplate} />
+          <HomeScreen templates={templates} activeTemplateId={activeSession.session?.templateId ?? null} onSelect={handleSelectTemplate} onAdd={addTemplate} onDelete={removeTemplate} />
         )}
         {tab === 'history' && (
           <HistoryScreen sessions={sessions} onViewSession={handleViewSession} onClearAll={handleClearAll} onExportCsv={exportToCsv} />
