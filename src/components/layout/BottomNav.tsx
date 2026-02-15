@@ -7,7 +7,7 @@ interface BottomNavProps {
 
 export function BottomNav({ active, onChange }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800/50 pb-safe z-20">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800/50 safe-bottom z-20">
       <div className="max-w-lg mx-auto flex">
         <NavButton
           label="Home"
