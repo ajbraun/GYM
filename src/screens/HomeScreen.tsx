@@ -5,12 +5,11 @@ import type { TemplateWithMeta } from '../hooks/useTemplates'
 interface HomeScreenProps {
   templates: TemplateWithMeta[]
   onSelect: (templateId: string) => void
-  onRename: (id: string, name: string) => void
   onAdd: (name: string) => void
   onDelete: (id: string) => void
 }
 
-export function HomeScreen({ templates, onSelect, onRename, onAdd, onDelete }: HomeScreenProps) {
+export function HomeScreen({ templates, onSelect, onAdd, onDelete }: HomeScreenProps) {
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
 
@@ -28,7 +27,6 @@ export function HomeScreen({ templates, onSelect, onRename, onAdd, onDelete }: H
           key={t.id}
           template={t}
           onSelect={onSelect}
-          onRename={onRename}
           onDelete={onDelete}
         />
       ))}

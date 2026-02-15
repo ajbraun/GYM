@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Exercise } from '../types/exercise'
 import type { WorkoutTemplate } from '../types/template'
 import { getExercisesForTemplate, updateExercise } from '../services/exerciseService'
-import { getTemplate } from '../services/templateService'
+import { getTemplate, updateTemplateName } from '../services/templateService'
 import { parseSetsReps } from '../services/exerciseLogService'
 
 interface TemplateDetailScreenProps {
@@ -24,6 +24,11 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
     if (tpl) setTemplate(tpl)
     setExercises(exs)
   }, [templateId])
+
+  const handleRename = async (name: string) => {
+    await updateTemplateName(templateId, name)
+    await load()
+  }
 
   useEffect(() => { load() }, [load])
 
@@ -51,7 +56,7 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-2xl">{template.emoji}</span>
-            <h1 className="text-lg font-bold text-white truncate">{template.name}</h1>
+            <EditableTitle name={template.name} onRename={handleRename} />
           </div>
           <button
             onClick={() => onEditExercises(templateId)}
@@ -132,6 +137,46 @@ function adjustReps(setsReps: string, delta: number): string {
 function canAdjustReps(setsReps: string): boolean {
   const { targetReps } = parseSetsReps(setsReps)
   return /^\d+/.test(targetReps)
+}
+
+function EditableTitle({ name, onRename }: { name: string; onRename: (name: string) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState(name)
+
+  const save = () => {
+    const trimmed = value.trim()
+    if (trimmed && trimmed !== name) {
+      onRename(trimmed)
+    } else {
+      setValue(name)
+    }
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') save()
+          if (e.key === 'Escape') { setValue(name); setEditing(false) }
+        }}
+        className="text-lg font-bold text-white bg-transparent border-b border-accent outline-none w-full"
+      />
+    )
+  }
+
+  return (
+    <h1
+      onClick={() => setEditing(true)}
+      className="text-lg font-bold text-white truncate cursor-pointer hover:text-accent-light transition-colors"
+    >
+      {name}
+    </h1>
+  )
 }
 
 function ExerciseStepperCard({
