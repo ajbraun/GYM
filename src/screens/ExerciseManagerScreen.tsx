@@ -3,6 +3,7 @@ import type { Exercise } from '../types/exercise'
 import type { WorkoutTemplate } from '../types/template'
 import { getAllExercisesForTemplate, updateExercise, addExercise } from '../services/exerciseService'
 import { getTemplate } from '../services/templateService'
+import { parseSetsReps } from '../services/exerciseLogService'
 
 interface ExerciseManagerScreenProps {
   templateId: string
@@ -173,6 +174,48 @@ export function ExerciseManagerScreen({ templateId, onBack }: ExerciseManagerScr
   )
 }
 
+function adjustSets(setsReps: string, delta: number): string {
+  const { setCount, targetReps } = parseSetsReps(setsReps)
+  const newSets = Math.max(1, setCount + delta)
+  return `${newSets} × ${targetReps}`
+}
+
+function adjustReps(setsReps: string, delta: number): string {
+  const { setCount, targetReps } = parseSetsReps(setsReps)
+
+  const rangeMatch = targetReps.match(/^(\d+)\s*-\s*(\d+)(.*)$/)
+  if (rangeMatch) {
+    const low = Math.max(1, parseInt(rangeMatch[1]) + delta)
+    const high = Math.max(1, parseInt(rangeMatch[2]) + delta)
+    return `${setCount} × ${low}-${high}${rangeMatch[3]}`
+  }
+
+  const singleMatch = targetReps.match(/^(\d+)(.*)$/)
+  if (singleMatch) {
+    const num = Math.max(1, parseInt(singleMatch[1]) + delta)
+    return `${setCount} × ${num}${singleMatch[2]}`
+  }
+
+  return setsReps
+}
+
+function canAdjustReps(setsReps: string): boolean {
+  const { targetReps } = parseSetsReps(setsReps)
+  return /^\d+/.test(targetReps)
+}
+
+function StepperButton({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 text-white text-base font-bold flex items-center justify-center transition-colors active:scale-95"
+    >
+      {children}
+    </button>
+  )
+}
+
 function ExerciseEditorRow({
   exercise,
   canMoveUp,
@@ -195,15 +238,15 @@ function ExerciseEditorRow({
   onMoveDown: () => void
 }) {
   const [editingName, setEditingName] = useState(false)
-  const [editingSets, setEditingSets] = useState(false)
   const [nameValue, setNameValue] = useState(exercise.name)
-  const [setsValue, setSetsValue] = useState(exercise.setsReps)
+  const { setCount, targetReps } = parseSetsReps(exercise.setsReps)
+  const repsAdjustable = canAdjustReps(exercise.setsReps)
 
   return (
     <div className="bg-surface-card rounded-2xl p-4">
-      <div className="flex items-start gap-3">
-        {/* Reorder */}
-        <div className="flex flex-col gap-0.5 pt-0.5 flex-shrink-0">
+      {/* Top row: reorder, name, badges, remove */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex gap-1 flex-shrink-0">
           <button
             onClick={onMoveUp}
             disabled={!canMoveUp}
@@ -228,7 +271,6 @@ function ExerciseEditorRow({
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           {editingName ? (
             <input
@@ -240,62 +282,62 @@ function ExerciseEditorRow({
                 if (e.key === 'Enter') { onUpdateName(nameValue); setEditingName(false) }
                 if (e.key === 'Escape') { setNameValue(exercise.name); setEditingName(false) }
               }}
-              className="text-sm text-white font-medium bg-transparent border-b border-accent outline-none w-full"
+              className="text-base text-white font-semibold bg-transparent border-b border-accent outline-none w-full"
             />
           ) : (
             <div
               onClick={() => setEditingName(true)}
-              className="text-sm text-white font-medium cursor-pointer hover:text-accent-light transition-colors truncate"
+              className="text-base text-white font-semibold cursor-pointer hover:text-accent-light transition-colors truncate"
             >
               {exercise.name}
             </div>
           )}
-
-          <div className="flex items-center gap-2.5 mt-1.5">
-            {editingSets ? (
-              <input
-                autoFocus
-                value={setsValue}
-                onChange={(e) => setSetsValue(e.target.value)}
-                onBlur={() => { onUpdateSetsReps(setsValue); setEditingSets(false) }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') { onUpdateSetsReps(setsValue); setEditingSets(false) }
-                  if (e.key === 'Escape') { setSetsValue(exercise.setsReps); setEditingSets(false) }
-                }}
-                className="text-xs text-gray-400 bg-transparent border-b border-gray-600 outline-none w-24"
-              />
-            ) : (
-              <span
-                onClick={() => setEditingSets(true)}
-                className="text-xs text-gray-500 cursor-pointer hover:text-gray-300 transition-colors"
-              >
-                {exercise.setsReps}
-              </span>
-            )}
-
-            <button
-              onClick={onToggleWeighted}
-              className={`text-xs px-2 py-0.5 rounded-md transition-colors ${
-                exercise.isWeighted
-                  ? 'bg-accent/15 text-accent'
-                  : 'bg-white/5 text-gray-500'
-              }`}
-            >
-              {exercise.isWeighted ? 'Weighted' : 'No weight'}
-            </button>
-          </div>
         </div>
 
-        {/* Remove */}
+        <button
+          onClick={onToggleWeighted}
+          className={`text-xs px-2 py-0.5 rounded-md transition-colors flex-shrink-0 ${
+            exercise.isWeighted
+              ? 'bg-accent/15 text-accent'
+              : 'bg-white/5 text-gray-500'
+          }`}
+        >
+          {exercise.isWeighted ? 'Weighted' : 'Body'}
+        </button>
+
         <button
           onClick={onToggleActive}
-          className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 p-1.5"
-          title="Remove from workout"
+          className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0 p-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+      </div>
+
+      {/* Steppers row */}
+      <div className="flex items-center gap-6">
+        <div className="flex-1">
+          <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1.5 font-medium">Sets</div>
+          <div className="flex items-center gap-2.5">
+            <StepperButton onClick={() => onUpdateSetsReps(adjustSets(exercise.setsReps, -1))} disabled={setCount <= 1}>−</StepperButton>
+            <span className="text-xl font-bold text-white tabular-nums w-6 text-center">{setCount}</span>
+            <StepperButton onClick={() => onUpdateSetsReps(adjustSets(exercise.setsReps, 1))}>+</StepperButton>
+          </div>
+        </div>
+
+        <div className="flex-1">
+          <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1.5 font-medium">Reps</div>
+          {repsAdjustable ? (
+            <div className="flex items-center gap-2.5">
+              <StepperButton onClick={() => onUpdateSetsReps(adjustReps(exercise.setsReps, -1))}>−</StepperButton>
+              <span className="text-xl font-bold text-white tabular-nums text-center min-w-6">{targetReps}</span>
+              <StepperButton onClick={() => onUpdateSetsReps(adjustReps(exercise.setsReps, 1))}>+</StepperButton>
+            </div>
+          ) : (
+            <div className="text-xl font-bold text-white h-9 flex items-center">{targetReps}</div>
+          )}
+        </div>
       </div>
     </div>
   )
