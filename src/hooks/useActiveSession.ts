@@ -5,12 +5,13 @@ import type { ExerciseLog } from '../types/exerciseLog'
 import { createSession, completeSession, getSession, getActiveSessionId } from '../services/sessionService'
 import { getExercisesForTemplate } from '../services/exerciseService'
 import { getOrCreateLog, updateLog, getLogsForSession } from '../services/exerciseLogService'
+import { getLastCompletedSession } from '../services/sessionService'
 
 export interface ActiveSessionState {
   session: WorkoutSession | null
   exercises: Exercise[]
   logs: Map<string, ExerciseLog>
-  elapsed: number // seconds
+  elapsed: number
 }
 
 export function useActiveSession() {
@@ -22,7 +23,6 @@ export function useActiveSession() {
   })
   const [loading, setLoading] = useState(true)
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
-  const debounceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   // Timer
   useEffect(() => {
@@ -60,10 +60,19 @@ export function useActiveSession() {
   const start = useCallback(async (templateId: string) => {
     const session = await createSession(templateId)
     const exercises = await getExercisesForTemplate(templateId)
-    // Pre-create logs for all exercises
+
+    // Get previous session's weights for pre-filling
+    const prevSession = await getLastCompletedSession(templateId)
+    let prevLogs: ExerciseLog[] = []
+    if (prevSession) {
+      prevLogs = await getLogsForSession(prevSession.id)
+    }
+    const prevWeightMap = new Map(prevLogs.map((l) => [l.exerciseId, l.weightUsed]))
+
     const logs = new Map<string, ExerciseLog>()
     for (const ex of exercises) {
-      const log = await getOrCreateLog(session.id, ex.id)
+      const prevWeight = prevWeightMap.get(ex.id) ?? null
+      const log = await getOrCreateLog(session.id, ex.id, ex.setsReps, prevWeight)
       logs.set(ex.id, log)
     }
     setState({ session, exercises, logs, elapsed: 0 })
@@ -71,20 +80,40 @@ export function useActiveSession() {
 
   const finish = useCallback(async () => {
     if (!state.session) return
-    // Flush any pending debounced saves
-    for (const timer of debounceTimers.current.values()) clearTimeout(timer)
-    debounceTimers.current.clear()
     await completeSession(state.session.id)
     setState({ session: null, exercises: [], logs: new Map(), elapsed: 0 })
   }, [state.session])
 
-  const toggleComplete = useCallback(async (exerciseId: string) => {
+  const completeSet = useCallback(async (
+    exerciseId: string,
+    setNumber: number,
+    weight: number | null,
+    actualReps: number | null
+  ) => {
     if (!state.session) return
     const log = await getOrCreateLog(state.session.id, exerciseId)
+    const sets = [...log.sets]
+    const idx = sets.findIndex((s) => s.setNumber === setNumber)
+    if (idx === -1) return
+
+    sets[idx] = {
+      ...sets[idx],
+      weight,
+      actualReps,
+      completed: true,
+      completedAt: new Date().toISOString(),
+    }
+
+    const allDone = sets.every((s) => s.completed)
+    // Use the last completed set's weight as the summary weight
+    const lastWeight = [...sets].reverse().find((s) => s.completed)?.weight ?? weight
+
     const updated: ExerciseLog = {
       ...log,
-      completed: !log.completed,
-      completedAt: !log.completed ? new Date().toISOString() : null,
+      sets,
+      completed: allDone,
+      weightUsed: lastWeight,
+      completedAt: allDone ? new Date().toISOString() : null,
     }
     await updateLog(updated)
     setState((s) => {
@@ -94,31 +123,30 @@ export function useActiveSession() {
     })
   }, [state.session])
 
-  const setWeight = useCallback((exerciseId: string, weight: number | null) => {
+  const updateSetBeforeStart = useCallback(async (
+    exerciseId: string,
+    setNumber: number,
+    updates: { weight?: number | null; targetReps?: string }
+  ) => {
     if (!state.session) return
-    const sessionId = state.session.id
+    const log = await getOrCreateLog(state.session.id, exerciseId)
+    const sets = [...log.sets]
+    const idx = sets.findIndex((s) => s.setNumber === setNumber)
+    if (idx === -1) return
 
-    // Optimistic UI update
+    sets[idx] = {
+      ...sets[idx],
+      ...(updates.weight !== undefined ? { weight: updates.weight } : {}),
+      ...(updates.targetReps !== undefined ? { targetReps: updates.targetReps } : {}),
+    }
+
+    const updated: ExerciseLog = { ...log, sets }
+    await updateLog(updated)
     setState((s) => {
       const logs = new Map(s.logs)
-      const existing = logs.get(exerciseId)
-      if (existing) {
-        logs.set(exerciseId, { ...existing, weightUsed: weight })
-      }
+      logs.set(exerciseId, updated)
       return { ...s, logs }
     })
-
-    // Debounced save
-    const existing = debounceTimers.current.get(exerciseId)
-    if (existing) clearTimeout(existing)
-    debounceTimers.current.set(
-      exerciseId,
-      setTimeout(async () => {
-        const log = await getOrCreateLog(sessionId, exerciseId)
-        await updateLog({ ...log, weightUsed: weight })
-        debounceTimers.current.delete(exerciseId)
-      }, 300)
-    )
   }, [state.session])
 
   const toggleGoUp = useCallback(async (exerciseId: string) => {
@@ -138,8 +166,8 @@ export function useActiveSession() {
     loading,
     start,
     finish,
-    toggleComplete,
-    setWeight,
+    completeSet,
+    updateSetBeforeStart,
     toggleGoUp,
     isActive: state.session !== null,
   }

@@ -3,6 +3,7 @@ import { Header } from './components/layout/Header'
 import { BottomNav, type Tab } from './components/layout/BottomNav'
 import { HomeScreen } from './screens/HomeScreen'
 import { ActiveSessionScreen } from './screens/ActiveSessionScreen'
+import { ExerciseDetailScreen } from './screens/ExerciseDetailScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
 import { SessionDetailScreen } from './screens/SessionDetailScreen'
 import { ExerciseManagerScreen } from './screens/ExerciseManagerScreen'
@@ -15,6 +16,7 @@ import { useSessionHistory } from './hooks/useSessionHistory'
 type Screen =
   | { type: 'tabs' }
   | { type: 'session' }
+  | { type: 'exerciseDetail'; exerciseId: string }
   | { type: 'sessionDetail'; sessionId: string }
   | { type: 'exerciseManager'; templateId: string }
 
@@ -47,6 +49,14 @@ function App() {
     reloadHistory()
   }, [activeSession.finish, reloadTemplates, reloadHistory])
 
+  const handleSelectExercise = useCallback((exerciseId: string) => {
+    setScreen({ type: 'exerciseDetail', exerciseId })
+  }, [])
+
+  const handleBackFromExercise = useCallback(() => {
+    setScreen({ type: 'session' })
+  }, [])
+
   const handleViewSession = useCallback((sessionId: string) => {
     setScreen({ type: 'sessionDetail', sessionId })
   }, [])
@@ -73,8 +83,28 @@ function App() {
     )
   }
 
-  // Active session - full screen, no bottom nav
-  if (screen.type === 'session' && activeSession.session) {
+  // Exercise detail within active session
+  if (screen.type === 'exerciseDetail' && activeSession.session) {
+    const exercise = activeSession.exercises.find((e) => e.id === screen.exerciseId)
+    const log = activeSession.logs.get(screen.exerciseId)
+    if (exercise && log) {
+      const prevLog = previousWeights.get(exercise.id)
+      return (
+        <ExerciseDetailScreen
+          exercise={exercise}
+          log={log}
+          previousWeight={prevLog?.weightUsed ?? null}
+          goUpSuggestion={goUpSuggestions.get(exercise.id) ?? null}
+          onBack={handleBackFromExercise}
+          onCompleteSet={activeSession.completeSet}
+          onToggleGoUp={activeSession.toggleGoUp}
+        />
+      )
+    }
+  }
+
+  // Active session dashboard
+  if ((screen.type === 'session' || screen.type === 'exerciseDetail') && activeSession.session) {
     const template = templates.find((t) => t.id === activeSession.session!.templateId)
     return (
       <ActiveSessionScreen
@@ -86,9 +116,7 @@ function App() {
         previousWeights={previousWeights}
         goUpSuggestions={goUpSuggestions}
         onFinish={handleFinish}
-        onToggleComplete={activeSession.toggleComplete}
-        onSetWeight={activeSession.setWeight}
-        onToggleGoUp={activeSession.toggleGoUp}
+        onSelectExercise={handleSelectExercise}
       />
     )
   }
