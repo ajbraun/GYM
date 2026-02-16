@@ -1,4 +1,5 @@
 import type { TemplateWithMeta } from '../../hooks/useTemplates'
+import { getTemplateImage } from '../../utils/templateImages'
 
 interface TemplateCardProps {
   template: TemplateWithMeta
@@ -31,6 +32,7 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
           : `${template.daysSinceLastDone}d ago`
 
   const gradient = GRADIENTS[template.emoji] ?? 'from-gray-800/80 to-gray-700/60'
+  const image = getTemplateImage(template.name)
 
   return (
     <button
@@ -39,11 +41,18 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
         isActive ? 'ring-2 ring-accent ring-offset-2 ring-offset-[#0f1420]' : ''
       }`}
     >
-      {/* Gradient background */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+      {/* Background: image or gradient */}
+      {image ? (
+        <img src={image} alt={template.name} className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <>
+          <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+          <div className="absolute inset-0 flex items-center justify-center pb-10">
+            <span className="text-7xl drop-shadow-lg select-none">{template.emoji}</span>
+          </div>
+        </>
+      )}
 
       {/* Delete button */}
       {!isActive && (
@@ -57,11 +66,6 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
           </svg>
         </div>
       )}
-
-      {/* Large centered emoji */}
-      <div className="absolute inset-0 flex items-center justify-center pb-10">
-        <span className="text-7xl drop-shadow-lg select-none">{template.emoji}</span>
-      </div>
 
       {/* Bottom overlay with name + meta */}
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-4 px-4">
