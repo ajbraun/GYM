@@ -35,7 +35,7 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
   return (
     <button
       onClick={() => onSelect(template.id)}
-      className={`relative w-full aspect-[4/3] rounded-2xl overflow-hidden text-left transition-all active:scale-[0.97] ${
+      className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden text-left transition-all active:scale-[0.97] ${
         isActive ? 'ring-2 ring-accent ring-offset-2 ring-offset-[#0f1420]' : ''
       }`}
     >

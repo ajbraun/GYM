@@ -67,21 +67,14 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
       <main className="max-w-lg mx-auto px-5 py-6">
         {exercises.length > 0 ? (
           <>
-            <button
-              onClick={() => onStart(templateId)}
-              className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98] mb-8"
-            >
-              Start Workout
-            </button>
-
-            <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               {exercises.map((ex, i) => {
                 const gradient = EXERCISE_GRADIENTS[i % EXERCISE_GRADIENTS.length]
                 const image = getExerciseImage(ex.name)
                 return (
                   <div
                     key={ex.id}
-                    className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden"
+                    className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden"
                   >
                     {image ? (
                       <img src={image} alt={ex.name} className="absolute inset-0 w-full h-full object-cover" />
@@ -106,6 +99,12 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
               })}
             </div>
 
+            <button
+              onClick={() => onStart(templateId)}
+              className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-4 rounded-2xl text-lg transition-colors active:scale-[0.98] mb-3"
+            >
+              Start Workout
+            </button>
             <button
               onClick={() => onEditExercises(templateId)}
               className="w-full border border-white/10 text-gray-400 hover:text-white hover:border-white/20 font-medium py-3.5 rounded-2xl text-sm transition-colors"
