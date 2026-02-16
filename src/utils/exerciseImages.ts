@@ -5,6 +5,8 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'romanian deadlifts': '/images/exercises/romanian-deadlift.png',
   'walking lunges': '/images/exercises/walking-lunges.png',
   'walking lunge': '/images/exercises/walking-lunges.png',
+  'glute bridge': '/images/exercises/glute-bridge.png',
+  'glute bridges': '/images/exercises/glute-bridge.png',
 }
 
 export function getExerciseImage(name: string): string | null {
