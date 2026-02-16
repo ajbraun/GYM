@@ -3,6 +3,7 @@ import type { Exercise } from '../types/exercise'
 import type { WorkoutTemplate } from '../types/template'
 import { getExercisesForTemplate } from '../services/exerciseService'
 import { getTemplate } from '../services/templateService'
+import { getExerciseImage } from '../utils/exerciseImages'
 
 const EXERCISE_GRADIENTS = [
   'from-orange-900/80 to-amber-800/60',
@@ -76,17 +77,23 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
             <div className="grid grid-cols-2 gap-3 mb-8">
               {exercises.map((ex, i) => {
                 const gradient = EXERCISE_GRADIENTS[i % EXERCISE_GRADIENTS.length]
+                const image = getExerciseImage(ex.name)
                 return (
                   <div
                     key={ex.id}
                     className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden"
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
-
-                    <div className="absolute inset-0 flex items-center justify-center pb-10">
-                      <span className="text-4xl drop-shadow-lg select-none">{ex.isWeighted ? '🏋️' : '💪'}</span>
-                    </div>
+                    {image ? (
+                      <img src={image} alt={ex.name} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+                        <div className="absolute inset-0 flex items-center justify-center pb-10">
+                          <span className="text-4xl drop-shadow-lg select-none">{ex.isWeighted ? '🏋️' : '💪'}</span>
+                        </div>
+                      </>
+                    )}
 
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-3 px-3">
                       <h3 className="text-white font-bold text-sm leading-tight truncate drop-shadow-sm">

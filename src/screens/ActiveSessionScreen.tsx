@@ -2,6 +2,7 @@ import type { Exercise } from '../types/exercise'
 import type { ExerciseLog } from '../types/exerciseLog'
 import type { GoUpSuggestion } from '../hooks/useGoUpSuggestions'
 import { SessionHeader } from '../components/session/SessionHeader'
+import { getExerciseImage } from '../utils/exerciseImages'
 
 interface ActiveSessionScreenProps {
   emoji: string
@@ -72,6 +73,7 @@ export function ActiveSessionScreen({
             const prevLog = previousWeights.get(ex.id)
             const lastWeight = prevLog?.weightUsed
             const gradient = EXERCISE_GRADIENTS[i % EXERCISE_GRADIENTS.length]
+            const image = getExerciseImage(ex.name)
 
             return (
               <button
@@ -81,11 +83,15 @@ export function ActiveSessionScreen({
                   isComplete ? 'ring-2 ring-success ring-offset-2 ring-offset-[#0f1420]' : ''
                 }`}
               >
-                {/* Gradient background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
-
-                {/* Subtle pattern overlay */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+                {/* Background: image or gradient */}
+                {image ? (
+                  <img src={image} alt={ex.name} className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+                  </>
+                )}
 
                 {/* Completion checkmark */}
                 {isComplete && (
@@ -96,16 +102,18 @@ export function ActiveSessionScreen({
                   </div>
                 )}
 
-                {/* Weight / suggestion info centered */}
-                <div className="absolute inset-0 flex items-center justify-center pb-10">
-                  {suggestion ? (
-                    <span className="text-2xl font-bold text-accent drop-shadow-lg">{suggestion.suggestedWeight} lbs</span>
-                  ) : ex.isWeighted && lastWeight != null ? (
-                    <span className="text-2xl font-bold text-white/70 drop-shadow-lg">{lastWeight} lbs</span>
-                  ) : (
-                    <span className="text-4xl drop-shadow-lg select-none">{ex.isWeighted ? '🏋️' : '💪'}</span>
-                  )}
-                </div>
+                {/* Weight / suggestion info (only when no image) */}
+                {!image && (
+                  <div className="absolute inset-0 flex items-center justify-center pb-10">
+                    {suggestion ? (
+                      <span className="text-2xl font-bold text-accent drop-shadow-lg">{suggestion.suggestedWeight} lbs</span>
+                    ) : ex.isWeighted && lastWeight != null ? (
+                      <span className="text-2xl font-bold text-white/70 drop-shadow-lg">{lastWeight} lbs</span>
+                    ) : (
+                      <span className="text-4xl drop-shadow-lg select-none">{ex.isWeighted ? '🏋️' : '💪'}</span>
+                    )}
+                  </div>
+                )}
 
                 {/* Bottom overlay with name + meta */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-3 px-3">
