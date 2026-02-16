@@ -7,6 +7,19 @@ interface TemplateCardProps {
   onDelete: (id: string) => void
 }
 
+const GRADIENTS: Record<string, string> = {
+  '💪': 'from-orange-900/80 to-amber-800/60',
+  '🦵': 'from-emerald-900/80 to-teal-800/60',
+  '⚡': 'from-yellow-900/80 to-amber-700/60',
+  '🔥': 'from-red-900/80 to-orange-800/60',
+  '❤️': 'from-rose-900/80 to-pink-800/60',
+  '🏋️': 'from-slate-800/80 to-zinc-700/60',
+  '🎯': 'from-indigo-900/80 to-blue-800/60',
+  '💥': 'from-amber-900/80 to-red-800/60',
+  '✨': 'from-purple-900/80 to-violet-800/60',
+  '🧘': 'from-cyan-900/80 to-teal-700/60',
+}
+
 export function TemplateCard({ template, isActive, onSelect, onDelete }: TemplateCardProps) {
   const staleness =
     template.daysSinceLastDone === null
@@ -17,47 +30,53 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
           ? 'Done yesterday'
           : `${template.daysSinceLastDone}d ago`
 
+  const gradient = GRADIENTS[template.emoji] ?? 'from-gray-800/80 to-gray-700/60'
+
   return (
     <button
       onClick={() => onSelect(template.id)}
-      className={`w-full rounded-2xl p-5 text-left transition-all active:scale-[0.98] ${
-        isActive
-          ? 'bg-accent/10 border border-accent/25 active:bg-accent/15'
-          : 'bg-surface-card active:bg-surface-hover'
+      className={`relative w-full aspect-[4/3] rounded-2xl overflow-hidden text-left transition-all active:scale-[0.97] ${
+        isActive ? 'ring-2 ring-accent ring-offset-2 ring-offset-[#0f1420]' : ''
       }`}
     >
-      <div className="flex items-center gap-4">
-        <div className="text-4xl">{template.emoji}</div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg text-white font-bold truncate">{template.name}</h3>
-          <div className="flex items-center gap-2 mt-1">
-            {isActive ? (
-              <span className="text-sm text-accent font-medium">In Progress</span>
-            ) : (
-              <>
-                <span className="text-sm text-gray-400">{staleness}</span>
-                <span className="text-gray-600">·</span>
-                <span className="text-sm text-gray-500">{template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''}</span>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {!isActive && (
-            <div
-              role="button"
-              onClick={(e) => { e.stopPropagation(); onDelete(template.id) }}
-              className="text-gray-700 hover:text-red-400 transition-colors p-1.5"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-          )}
-          <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+      {/* Gradient background */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+
+      {/* Delete button */}
+      {!isActive && (
+        <div
+          role="button"
+          onClick={(e) => { e.stopPropagation(); onDelete(template.id) }}
+          className="absolute top-3 right-3 z-10 text-white/40 hover:text-red-400 transition-colors p-1.5 bg-black/20 rounded-full"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
+      )}
+
+      {/* Large centered emoji */}
+      <div className="absolute inset-0 flex items-center justify-center pb-10">
+        <span className="text-7xl drop-shadow-lg select-none">{template.emoji}</span>
+      </div>
+
+      {/* Bottom overlay with name + meta */}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-4 px-4">
+        <h3 className="text-white font-bold text-base leading-tight truncate drop-shadow-sm">
+          {template.name}
+        </h3>
+        <p className="text-white/60 text-xs mt-0.5">
+          {isActive ? (
+            <span className="text-accent font-medium">In Progress</span>
+          ) : (
+            <>
+              {staleness} · {template.exerciseCount} exercise{template.exerciseCount !== 1 ? 's' : ''}
+            </>
+          )}
+        </p>
       </div>
     </button>
   )
