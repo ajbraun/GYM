@@ -4,6 +4,19 @@ import type { WorkoutTemplate } from '../types/template'
 import { getExercisesForTemplate } from '../services/exerciseService'
 import { getTemplate } from '../services/templateService'
 
+const EXERCISE_GRADIENTS = [
+  'from-orange-900/80 to-amber-800/60',
+  'from-emerald-900/80 to-teal-800/60',
+  'from-indigo-900/80 to-blue-800/60',
+  'from-rose-900/80 to-pink-800/60',
+  'from-purple-900/80 to-violet-800/60',
+  'from-cyan-900/80 to-teal-700/60',
+  'from-yellow-900/80 to-amber-700/60',
+  'from-red-900/80 to-orange-800/60',
+  'from-slate-800/80 to-zinc-700/60',
+  'from-amber-900/80 to-red-800/60',
+]
+
 interface TemplateDetailScreenProps {
   templateId: string
   onBack: () => void
@@ -60,18 +73,30 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
               Start Workout
             </button>
 
-            <div className="space-y-3 mb-8">
-              {exercises.map((ex) => (
-                <div key={ex.id} className="bg-surface-card rounded-2xl px-5 py-4 flex items-center justify-between">
-                  <div>
-                    <div className="text-base font-semibold text-white">{ex.name}</div>
-                    <div className="text-sm text-gray-500 mt-0.5">{ex.setsReps}</div>
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {exercises.map((ex, i) => {
+                const gradient = EXERCISE_GRADIENTS[i % EXERCISE_GRADIENTS.length]
+                return (
+                  <div
+                    key={ex.id}
+                    className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
+
+                    <div className="absolute inset-0 flex items-center justify-center pb-10">
+                      <span className="text-4xl drop-shadow-lg select-none">{ex.isWeighted ? '🏋️' : '💪'}</span>
+                    </div>
+
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-3 px-3">
+                      <h3 className="text-white font-bold text-sm leading-tight truncate drop-shadow-sm">
+                        {ex.name}
+                      </h3>
+                      <p className="text-white/50 text-xs mt-0.5">{ex.setsReps}</p>
+                    </div>
                   </div>
-                  {ex.isWeighted && (
-                    <span className="text-xs text-gray-500 bg-white/5 px-2.5 py-1 rounded-lg">Weighted</span>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             <button
