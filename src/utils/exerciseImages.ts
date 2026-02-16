@@ -9,6 +9,7 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'glute bridges': '/images/exercises/glute-bridge.png',
   'seated calf raise': '/images/exercises/seated-calf-raise.png',
   'seated calf raises': '/images/exercises/seated-calf-raise.png',
+  'db overhead press': '/images/exercises/db-overhead-press.png',
 }
 
 export function getExerciseImage(name: string): string | null {
