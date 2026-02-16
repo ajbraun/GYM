@@ -10,6 +10,8 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'seated calf raise': '/images/exercises/seated-calf-raise.png',
   'seated calf raises': '/images/exercises/seated-calf-raise.png',
   'db overhead press': '/images/exercises/db-overhead-press.png',
+  'lat pulldown': '/images/exercises/lat-pulldown.png',
+  'lat pulldowns': '/images/exercises/lat-pulldown.png',
 }
 
 export function getExerciseImage(name: string): string | null {
