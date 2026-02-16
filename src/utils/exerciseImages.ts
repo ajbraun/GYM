@@ -12,6 +12,12 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'db overhead press': '/images/exercises/db-overhead-press.png',
   'lat pulldown': '/images/exercises/lat-pulldown.png',
   'lat pulldowns': '/images/exercises/lat-pulldown.png',
+  'push up': '/images/exercises/push-up.png',
+  'push ups': '/images/exercises/push-up.png',
+  'push-up': '/images/exercises/push-up.png',
+  'push-ups': '/images/exercises/push-up.png',
+  'pushup': '/images/exercises/push-up.png',
+  'pushups': '/images/exercises/push-up.png',
 }
 
 export function getExerciseImage(name: string): string | null {
