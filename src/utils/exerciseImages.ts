@@ -18,6 +18,10 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'push-ups': '/images/exercises/push-up.png',
   'pushup': '/images/exercises/push-up.png',
   'pushups': '/images/exercises/push-up.png',
+  'bentover arm rows': '/images/exercises/bentover-rows.png',
+  'bent over arm rows': '/images/exercises/bentover-rows.png',
+  'bentover rows': '/images/exercises/bentover-rows.png',
+  'bent over rows': '/images/exercises/bentover-rows.png',
 }
 
 export function getExerciseImage(name: string): string | null {
