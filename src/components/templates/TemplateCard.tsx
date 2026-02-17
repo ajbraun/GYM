@@ -68,7 +68,7 @@ export function TemplateCard({ template, isActive, onSelect, onDelete }: Templat
       )}
 
       {/* Bottom overlay with name + meta */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-4 px-4">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-5 px-5">
         <h3 className="text-white font-bold text-base leading-tight truncate drop-shadow-sm">
           {template.name}
         </h3>

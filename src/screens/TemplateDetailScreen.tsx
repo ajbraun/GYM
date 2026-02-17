@@ -88,7 +88,7 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
                       </>
                     )}
 
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-4 px-4">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-10 pb-5 px-5">
                       <h3 className="text-white font-bold text-sm leading-tight truncate drop-shadow-sm">
                         {ex.name}
                       </h3>
