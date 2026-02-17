@@ -79,7 +79,7 @@ export function ActiveSessionScreen({
               <button
                 key={ex.id}
                 onClick={() => onSelectExercise(ex.id)}
-                className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden text-left transition-all active:scale-[0.97] ${
+                className={`relative w-full aspect-[3/4] rounded-xl overflow-hidden text-left transition-all active:scale-[0.97] ${
                   isComplete ? 'ring-2 ring-success ring-offset-2 ring-offset-[#0f1420]' : ''
                 }`}
               >

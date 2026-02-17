@@ -74,7 +74,7 @@ export function TemplateDetailScreen({ templateId, onBack, onStart, onEditExerci
                 return (
                   <div
                     key={ex.id}
-                    className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden"
+                    className="relative w-full aspect-[3/4] rounded-xl overflow-hidden"
                   >
                     {image ? (
                       <img src={image} alt={ex.name} className="absolute inset-0 w-full h-full object-cover" />
