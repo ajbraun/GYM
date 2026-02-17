@@ -25,6 +25,7 @@ const EXERCISE_IMAGES: Record<string, string> = {
   'bench press': '/images/exercises/bench-press.png',
   'stair jumps': '/images/exercises/stair-jumps.png',
   'stair jump': '/images/exercises/stair-jumps.png',
+  'light cardio': '/images/exercises/light-cardio.png',
 }
 
 export function getExerciseImage(name: string): string | null {
