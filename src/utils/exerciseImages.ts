@@ -32,5 +32,17 @@ const EXERCISE_IMAGES: Record<string, string> = {
 }
 
 export function getExerciseImage(name: string): string | null {
-  return EXERCISE_IMAGES[name.toLowerCase().trim()] ?? null
+  const n = name.toLowerCase().trim()
+  // Exact match first
+  if (EXERCISE_IMAGES[n]) return EXERCISE_IMAGES[n]
+  // Fuzzy: find longest key contained in name, or name contained in key
+  let best: string | null = null
+  let bestLen = 0
+  for (const key of Object.keys(EXERCISE_IMAGES)) {
+    if ((n.includes(key) || key.includes(n)) && key.length > bestLen) {
+      best = key
+      bestLen = key.length
+    }
+  }
+  return best ? EXERCISE_IMAGES[best] : null
 }
